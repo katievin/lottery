@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '../views/Home.vue';
+import BigLottery from '../views/BigLottery.vue';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'Home',
     component: Home,
+  },
+  {
+    path: '/BigLottery',
+    name: 'BigLottery',
+    component: BigLottery,
   },
   {
     path: '/about',
