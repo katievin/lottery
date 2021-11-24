@@ -1,6 +1,9 @@
 <template>
   <div>
     <div class="container">
+      <div class="px-4 py-5">
+        <h2 class="pb-2 border-bottom">大樂透</h2>
+      </div>
       <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
           <button class="nav-link active" id="pills-home-tab" data-bs-toggle="pill"
@@ -48,13 +51,27 @@
         </div>
         <button type="button" :class="{'disabled':hasRepeatNumber||
         insertLotteryNumber.indexOf(null)!==-1||insertLotteryNumber.indexOf('')!==-1}"
-        class="d-inline btn btn-outline-info" @click="insertLottery">
+        class="d-inline btn btn-outline-info" @click="insertLottery"
+        data-bs-toggle="modal" data-bs-target="#checkModal">
           輸入號碼
         </button>
       </div>
     </div>
     <div class="container">
       <div id="chart-bigLottery"></div>
+    </div>
+    <div class="modal fade" id="checkModal"
+    tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-body">
+            成功輸入
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -66,6 +83,7 @@ import {
 } from 'vue';
 import * as d3 from 'd3';
 import axios from 'axios';
+import bootstrap from 'bootstrap';
 
 // class BarChart {
 //     protected x = (d:any) => d;
@@ -173,6 +191,11 @@ export const BigLottery = defineComponent({
     };
     const insertLottery = () => {
       const newInsertLotteryNumber = [...insertLotteryNumber] as unknown as number[];
+      // js manually modal failed
+      // const modal = new bootstrap.Modal(document.getElementById('checkModal'), {});
+      // document.onreadystatechange = function () {
+      //   modal.show();
+      // };
       axios({
         method: 'POST',
         url: 'biglottery',

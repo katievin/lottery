@@ -16,7 +16,7 @@
         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
       </symbol>
     </svg>
-    <div class="bg-secondary text-white py-5 my-2 text-center">
+    <div class="bg-secondary text-white py-5 my-4 text-center">
       <h1 class="display-5 fw-bold">樂透</h1>
       <div class="col-lg-6 mx-auto">
         <p class="lead mb-4">
@@ -34,7 +34,7 @@
           </div>
           <h2>大樂透</h2>
           <p>大樂透必須從01~49中任選6個號碼(不可重複)進行投注。開獎時，開獎單位將隨機開出六個號碼加一個特別號，這一組號碼就是該期大樂透的中獎號碼，
-            若選擇號碼與六個號碼相同者(非特別號)即為頭獎。更詳細玩法請參考
+            若選擇號碼與六個號碼相同者(非特別號)即為頭獎。
           </p>
           <p>詳細玩法請參考(台灣彩券):<a href="https://www.taiwanlottery.com.tw/lotto649/index.asp">台灣彩券官網</a></p>
           <router-link to="/BigLottery">
@@ -47,11 +47,12 @@
             <svg class="bi" width="1em" height="1em"><use xlink:href="#dollar-sign"/></svg>
           </div>
           <h2>威力彩</h2>
-          <p></p>
-          <a href="#" class="icon-link">
-            Call to action
-            <svg class="bi" width="1em" height="1em"><use xlink:href="#chevron-right"/></svg>
-          </a>
+          <p>
+            威力彩是一種樂透型遊戲，其選號分為兩區，您必須從第1個選號區中的01~38的號碼中任選6個號碼，
+            並從第2個選號區中的01~08的號碼中任選1個號碼進行投注，這6+1個號碼即為您的投注號碼。
+          </p>
+          <p>詳細玩法請參考(台灣彩券):<a href="https://www.taiwanlottery.com.tw/superlotto638/index.asp">台灣彩券官網</a></p>
+          <p class="text-secondary">即將開放</p>
         </div>
       </div>
     </div>
