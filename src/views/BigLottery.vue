@@ -3,6 +3,22 @@
     <div class="container">
       <div class="px-4 py-5">
         <h2 class="pb-2 border-bottom">大樂透</h2>
+        <div class="row row-cols-1 row-cols-sm-2">
+          <div class="col py-2">
+            <div>上期:第{{phaseInfo.nowPhase}}期</div>
+            <div :class="{'bigLottery__topic--isTrue':phaseInfo.lastPhase.status.hasNumber,
+            'bigLottery__topic--isFalse':!phaseInfo.lastPhase.status.hasNumber}">
+              {{(phaseInfo.lastPhase.status.hasNumber)?
+              '本資料庫有開出號碼'+phaseInfo.lastPhase.status.type:'本資料庫無開出號碼'}}
+            </div>
+          </div>
+          <div class="col py-2">
+            <div>上期號碼(<span class="text-danger">特別號</span>)</div>
+            <span v-for="(t,index) in phaseInfo.lastPhase.normalNumber" :key="index">
+              {{t}}&nbsp;&nbsp;</span>
+            <span class="text-danger">{{phaseInfo.lastPhase.specialNumber}}</span>
+          </div>
+        </div>
       </div>
       <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
         <li class="nav-item" role="presentation">
@@ -85,86 +101,15 @@ import * as d3 from 'd3';
 import axios from 'axios';
 import bootstrap from 'bootstrap';
 
-// class BarChart {
-//     protected x = (d:any) => d;
-
-//     protected y = (d:any, i:any) => i;
-
-//     protected title?: string[];
-
-//     protected marginTop = 30; // the top margin, in pixels
-
-//     protected marginRight = 0; // the right margin, in pixels
-
-//     protected marginBottom = 10; // the bottom margin, in pixels
-
-//     protected marginLeft = 30;
-
-//     protected width = 640;
-
-//     protected height?: number;
-
-//     protected xType = d3.scaleLinear; // type of x-scale
-
-//     protected xDomain?:number[];
-
-//     protected xRange = [this.marginLeft, this.width - this.marginRight];
-
-//     protected xFormat?:string;
-
-//     protected xLabel?:string;
-
-//     protected yPadding = 0.1; // amount of y-range to reserve to separate bars
-
-//     protected yDomain?:any; // an array of (ordinal) y-values
-
-//     protected yRange?:number[];
-
-//     protected color = 'currentColor'; // bar fill color
-
-//     protected titleColor = 'white';// title fill color when atop bar
-
-//     protected titleAltColor = 'currentColor'
-
-//     constructor(data:{letter:string;frequency:number}[]) {
-//       // Compute values.
-//       const X = d3.map(data, this.x);
-//       const Y = d3.map(data, this.y);
-
-//       // Compute default domains, and unique the y-domain.
-//       if (this.xDomain === undefined) this.xDomain = [0, d3.max(X)];
-//       if (this.yDomain === undefined) this.yDomain = Y;
-//       this.yDomain = new d3.InternSet(this.yDomain);
-
-//       // Omit any data not present in the y-domain.
-//       const I = d3.range(X.length).filter((i) => this.yDomain.has(Y[i]));
-
-//       // Compute the default height.
-
-//       // Construct scales and axes.
-//       const xScale = this.xType(this.xDomain, this.xRange);
-//       const yScale = d3.scaleBand(this.yDomain, this.yRange).padding(this.yPadding);
-//       const xAxis = d3.axisTop(xScale).ticks(this.width / 80, this.xFormat);
-//       const yAxis = d3.axisLeft(yScale).tickSizeOuter(0);
-
-//       // Compute titles.
-//       if (this.title === undefined) {
-//         const formatValue = xScale.tickFormat(100, this.xFormat);
-//         this.title = (i) => `${formatValue(X[i])}`;
-//       } else {
-//         const O = d3.map(data, (d) => d);
-//         const T = title;
-//         title = (i) => T(O[i], i, data);
-//       }
-//     }
-// }
-
 export const BigLottery = defineComponent({
   name: 'BigLottery',
   setup() {
     const data:{ letter: string;frequency: number }[] = reactive([]);
     const newLotteryNumber:number[] = reactive([]);
-    const insertLotteryNumber:number|null[] = reactive([null, null, null, null, null, null]);
+    const insertLotteryNumber:(number|null)[] = reactive([null, null, null, null, null, null]);
+    const phaseInfo:
+    {nowPhase?:string, lastPhase:{specialNumber?:string;normalNumber?:string[];status:
+    {hasNumber?:boolean;type?:string}}} = reactive({ lastPhase: { status: {} } });
     const hasRepeatNumber = computed(() => {
       const newInsertLotteryNumber = insertLotteryNumber.filter((e) => e !== null) as
       unknown as number[];
@@ -179,23 +124,21 @@ export const BigLottery = defineComponent({
     });
     const dataChange = (res:any) => {
       data.length = 0;
-      const resValues = Object.values(res) as number[];
-      const sum = resValues.reduce(
-        (previousValue:number, currentValue:number) => previousValue + currentValue,
-      );
-      // Object.keys()
-      // eslint-disable-next-line no-restricted-syntax
-      for (const [key, value] of Object.entries(res)) {
-        data.push({ letter: key, frequency: value as number / sum });
+      if (Object.keys(res).length !== 0) {
+        const resValues = Object.values(res) as number[];
+        const sum = resValues.reduce(
+          (previousValue:number, currentValue:number) => previousValue + currentValue,
+        );
+        // Object.keys()
+        // eslint-disable-next-line no-restricted-syntax
+        for (const [key, value] of Object.entries(res)) {
+          data.push({ letter: key, frequency: value as number / sum });
+        }
       }
     };
+
     const insertLottery = () => {
       const newInsertLotteryNumber = [...insertLotteryNumber] as unknown as number[];
-      // js manually modal failed
-      // const modal = new bootstrap.Modal(document.getElementById('checkModal'), {});
-      // document.onreadystatechange = function () {
-      //   modal.show();
-      // };
       axios({
         method: 'POST',
         url: 'biglottery',
@@ -206,27 +149,56 @@ export const BigLottery = defineComponent({
         .then((res) => {
           if ('Item' in res.data.times) {
             // eslint-disable-next-line no-param-reassign
-            delete res.data.times.Item.id;
-            dataChange(res.data.times.Item);
+            const result = res.data.times.Item;
+            delete result.id;
+            delete result.phase;
+            delete result.lastPhaseInfo;
+            dataChange(result);
           } else if ('Attributes' in res.data.times) {
-            // eslint-disable-next-line no-param-reassign
-            delete res.data.times.Attributes.id;
-            dataChange(res.data.times.Attributes);
+            const result = res.data.times.Attributes;
+            delete result.id;
+            delete result.phase;
+            delete result.lastPhaseInfo;
+            dataChange(result);
           }
         });
       for (let i = 0; i < 6; i += 1) {
         insertLotteryNumber.splice(i, 1, null);
       }
     };
+    const phaseChange = (phase:string,
+      lastPhaseInfo:{specialNumber:string;normalNumber:string;
+      status:{hasNumber:boolean;type?:string}}) => {
+      phaseInfo.nowPhase = phase;
+      phaseInfo.lastPhase.specialNumber = lastPhaseInfo.specialNumber;
+      phaseInfo.lastPhase.normalNumber = lastPhaseInfo.normalNumber.split('-');
+      phaseInfo.lastPhase.status.hasNumber = lastPhaseInfo.status.hasNumber;
+      if (lastPhaseInfo.status.type) {
+        switch (lastPhaseInfo.status.type) {
+          case 'insert':
+            phaseInfo.lastPhase.status.type = '(自行輸入)';
+            break;
+          case 'random':
+            phaseInfo.lastPhase.status.type = '(隨機產生)';
+            break;
+          default:
+            break;
+        }
+      }
+    };
     (() => {
+      // 初始資料
       axios({
         method: 'GET',
         url: 'biglottery',
       })
         .then((res) => {
-          // eslint-disable-next-line no-param-reassign
-          delete res.data.Item.id;
-          dataChange(res.data.Item);
+          const result = res.data.Item;
+          phaseChange(result.phase, result.lastPhaseInfo);
+          delete result.id;
+          delete result.phase;
+          delete result.lastPhaseInfo;
+          dataChange(result);
           // console.log(res.data.Item);
         });
     })();
@@ -259,8 +231,10 @@ export const BigLottery = defineComponent({
         .then((res) => {
           const result = res.data;
           delete result.times.Attributes.id;
+          delete result.times.Attributes.phase;
+          delete result.times.Attributes.lastPhaseInfo;
           dataChange(result.times.Attributes);
-          changeLotteryNumber(result.number);
+          changeLotteryNumber(res.data.number);
         });
     };
     watch(data, () => {
@@ -384,6 +358,7 @@ export const BigLottery = defineComponent({
       insertLotteryNumber,
       hasRepeatNumber,
       insertLottery,
+      phaseInfo,
     };
   },
 });
@@ -391,4 +366,16 @@ export default BigLottery;
 </script>
 
 <style lang='scss'>
+@import "node_modules/bootstrap/scss/functions";
+@import "node_modules/bootstrap/scss/variables";
+.bigLottery{
+  &__topic{
+    &--isTrue{
+      color:$orange-500
+    }
+    &--isFalse{
+      color:$gray-600
+    }
+  }
+}
 </style>

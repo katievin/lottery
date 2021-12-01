@@ -1,5 +1,5 @@
 import {
-  mount, shallowMount, RouterLinkStub, flushPromises,
+  mount, flushPromises,
 } from '@vue/test-utils';
 import { createRouter, createWebHistory } from 'vue-router';
 import App from '@/App.vue';
