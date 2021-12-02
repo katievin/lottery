@@ -14,7 +14,7 @@ git add -A
 git commit -m 'deploy'
 git branch -m master main
 
-# 將 dist資料夾中的內容推送至遠端 hexWeek6Demo的 gh-pages分支中，並強制無條件將舊有的內容取代成目前的內容（指令 git push -f)
+# 將 dist資料夾中的內容推送至遠端 的 gh-pages分支中，並強制取代
 git push -f https://github.com/katievin/lottery.git main:gh-pages
 cd -
 
